@@ -1,51 +1,39 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <title>API Test</title>
+</head>
 <body>
+
+<h2>Test Verify API</h2>
+
+<input id="keyInput" placeholder="Enter key (or leave empty)">
+<button onclick="callAPI()">Send Request</button>
+
+<pre id="output"></pre>
+
 <script>
-function randomNumber(len) {
-  return Array.from({ length: len }, () => Math.floor(Math.random() * 10)).join("");
+function randomKey() {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const part = len => Array.from({length: len}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+  return `KW-${part(4)}-${part(8)}-${part(4)}`;
 }
 
-function randomName() {
-  const first = ["Andrew","John","Michael","David","Chris"];
-  const last = ["Henry","Smith","Brown","Taylor","Wilson"];
-  return first[Math.floor(Math.random()*first.length)] + " " +
-         last[Math.floor(Math.random()*last.length)];
+function callAPI() {
+  let key = document.getElementById("keyInput").value;
+  if (!key) key = randomKey();
+
+  fetch(`/.netlify/functions/verify?key=${key}`)
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("output").textContent =
+        JSON.stringify(data, null, 2);
+    })
+    .catch(err => {
+      document.getElementById("output").textContent = "Error: " + err;
+    });
 }
-
-function randomExpiry() {
-  const year = 2026 + Math.floor(Math.random() * 6);
-  const month = String(Math.floor(Math.random() * 12) + 1).padStart(2, "0");
-  return `${year}/${month}`;
-}
-
-const params = new URLSearchParams(window.location.search);
-const key = params.get("key") || "KW-TEST-00000000-0000";
-
-const response = {
-  success: true,
-  card: {
-    key: key,
-    category: randomNumber(4),
-    expires_at: new Date(Date.now() + 86400000 * 30).toISOString(),
-    activated_at: new Date().toISOString(),
-    status: "used"
-  },
-  content: {
-    card_number: randomNumber(16),
-    expiry_date: randomExpiry(),
-    cvv: randomNumber(3),
-    phone: "+1" + randomNumber(10),
-    sms_api: "https://adxtreme.github.io/x",
-    name: randomName(),
-    address: "Random Address, USA"
-  }
-};
-
-// Replace entire page with JSON
-document.open();
-document.write(JSON.stringify(response));
-document.close();
 </script>
+
 </body>
 </html>
