@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<body>
+<pre id="output"></pre>
+
+<script>
+function randomNumber(len) {
+  return Array.from({ length: len }, () => Math.floor(Math.random() * 10)).join("");
+}
+
+function randomName() {
+  const first = ["Andrew", "John", "Michael", "David", "Chris", "Daniel", "James"];
+  const last = ["Henry", "Smith", "Brown", "Taylor", "Wilson", "Clark", "Hall"];
+  return first[Math.floor(Math.random() * first.length)] + " " +
+         last[Math.floor(Math.random() * last.length)];
+}
+
+function randomExpiry() {
+  const year = 2026 + Math.floor(Math.random() * 6); // 2026–2031
+  const month = String(Math.floor(Math.random() * 12) + 1).padStart(2, "0");
+  return `${year}/${month}`;
+}
+
+function randomPhone() {
+  return "+1" + randomNumber(10);
+}
+
+function randomAddress() {
+  const streets = ["Main St", "Oak Ave", "Pine Rd", "Maple Dr", "Cedar Ln"];
+  const cities = ["New York", "Los Angeles", "Chicago", "Houston", "Miami"];
+  return `${randomNumber(5)} ${streets[Math.floor(Math.random()*streets.length)]}, ${cities[Math.floor(Math.random()*cities.length)]}, US`;
+}
+
+const params = new URLSearchParams(window.location.search);
+const key = params.get("key") || "KW-TEST-00000000-0000";
+
+const response = {
+  success: true,
+  card: {
+    key: key,
+    category: randomNumber(4),
+    expires_at: new Date(Date.now() + 86400000 * 30).toISOString(),
+    activated_at: new Date().toISOString(),
+    status: "used"
+  },
+  content: {
+    card_number: randomNumber(16),
+    expiry_date: randomExpiry(),
+    cvv: randomNumber(3),
+    phone: randomPhone(),
+    sms_api: "https://adxtreme.github.io/x",
+    name: randomName(),
+    address: randomAddress()
+  }
+};
+
+document.body.innerText = JSON.stringify(response, null, 2);
+</script>
+</body>
+</html>
